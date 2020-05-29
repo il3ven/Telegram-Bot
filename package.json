@@ -1,0 +1,14 @@
+{
+  "name": "sks-bot-v1",
+  "version": "1.0.0",
+  "description": "Bot for telegram",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SKS",
+  "license": "ISC",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.50.0"
+  }
+}
