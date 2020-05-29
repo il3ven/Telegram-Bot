@@ -1,3 +1,2 @@
-./node_moudles/**
-
-./config.json
+/config.json
+node_modules
