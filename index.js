@@ -8,7 +8,7 @@ bot.onText(/\/conf (.+)/, (msg, match) => {
     const chatId = msg.chat.id;
     const resp = match[1];
 
-    const result = /.+([0-9]+) ((m|mins|min|minutes|minute)|(h|hour|hours)|(d|days|day))$/.exec(resp);
+    const result = /.+ ([0-9]+) ((m|mins|min|minutes|minute)|(h|hour|hours)|(d|days|day))$/.exec(resp);
 
     const reminderMessage = "Aaka, samay hogya hai";
     const confirmation = "Ji! Mere aaka";
