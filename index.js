@@ -1,7 +1,7 @@
-const config = require('./config.json')
+// const config = require('./config.json')
 const TelegramBot = require('node-telegram-bot-api');
 
-const bot = new TelegramBot(process.env.token || config.token, {polling: true});
+const bot = new TelegramBot(process.env.token, {polling: true});
 bot.on("polling_error", (err) => console.log(err));
 
 function setReminder(msg, replyMessage, incomingMessage, replyId) {
