@@ -1,11 +1,11 @@
-//const config = require('./config.json')
+const config = require('./config.json')
 const TelegramBot = require('node-telegram-bot-api');
 const Agenda = require('agenda');
 
-const mongoConnectionString = process.env.MONGODB_URL;
+const mongoConnectionString = process.env.MONGODB_URL || 'mongodb+srv://sks_bot:JqVjIcVy6ZfVWInC@telegram-bot-v1-7kzz8.mongodb.net/test?retryWrites=true&w=majority';
 const agenda = new Agenda({db: {address: mongoConnectionString}});
 
-const bot = new TelegramBot(process.env.token, {polling: true});
+const bot = new TelegramBot(process.env.token || config.token, {polling: true});
 bot.on("polling_error", (err) => console.log(err));
 
 agenda.define('send-message', {priority: 'high'}, async job => {
