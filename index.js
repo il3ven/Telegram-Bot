@@ -9,14 +9,14 @@ const bot = new TelegramBot(process.env.token, {polling: true});
 bot.on("polling_error", (err) => console.log(err));
 
 agenda.define('send-message', {priority: 'high'}, async job => {
-    // console.log("Send Message running");
+    console.log("Send Message running");
     const {chatId, replyMessage, replyId} = job.attrs.data;
     await bot.sendMessage(chatId, replyMessage.reminderMessage, {"reply_to_message_id": replyId});
 })
 
 agenda.define('clean-database', async job => {    
     const numRemoved = await agenda.cancel({name: 'send-message', nextRunAt: {$ne: null}});
-    // console.log(numRemoved + " have been removed");
+    console.log(numRemoved + " have been removed");
 });
 
 // agenda.schedule('in 10 seconds', 'task', {"id": 123});
