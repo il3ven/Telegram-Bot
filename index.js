@@ -33,13 +33,13 @@ async function setReminder(msg, replyMessage, incomingMessage, replyId) {
         if(result[3] !== undefined) {
             bot.sendMessage(chatId, replyMessage.confirmation);
             // console.log("Scheduling message in " + result[1]);
-            await agenda.schedule('in ' + result[1] + 'minutes', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
+            await agenda.schedule('in ' + result[1] + ' minutes', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
         } else if (result[4] !== undefined) {
             bot.sendMessage(chatId, replyMessage.confirmation);
-            await agenda.schedule('in ' + result[1] + 'hours', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
+            await agenda.schedule('in ' + result[1] + ' hours', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
         } else if (result[5] !== undefined) {
             bot.sendMessage(chatId, replyMessage.confirmation);
-            await agenda.schedule('in ' + result[1] + 'days', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
+            await agenda.schedule('in ' + result[1] + ' days', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
         } else {
             bot.sendMessage(chatId, replyMessage.errorMessage);
         }
