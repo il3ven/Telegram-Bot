@@ -15,7 +15,7 @@ agenda.define('send-message', {priority: 'high'}, async job => {
 })
 
 agenda.define('clean-database', async job => {    
-    const numRemoved = await agenda.cancel({name: 'send-message'});
+    const numRemoved = await agenda.cancel({name: 'send-message', nextRunAt: {$ne: null}});
     // console.log(numRemoved + " have been removed");
 });
 
