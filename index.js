@@ -1,29 +1,9 @@
-const config = require('./config.json')
-const TelegramBot = require('node-telegram-bot-api');
-const Agenda = require('agenda');
+const agenda = require('./lib/agenda.js')
+const {sksGroupId} = require('./config.json')
+const bot = require('./lib/bot.js')
+const syncMessageStats = require('./lib/mongodb.js')
 
-const mongoConnectionString = process.env.MONGODB_URL || 'mongodb+srv://sks_bot:JqVjIcVy6ZfVWInC@telegram-bot-v1-7kzz8.mongodb.net/test?retryWrites=true&w=majority';
-const agenda = new Agenda({db: {address: mongoConnectionString}});
-
-const bot = new TelegramBot(process.env.token || config.token, {polling: true});
-bot.on("polling_error", (err) => console.log(err));
-
-agenda.define('send-message', {priority: 'high'}, async job => {
-    // console.log("Send Message running");
-    const {chatId, replyMessage, replyId} = job.attrs.data;
-    await bot.sendMessage(chatId, replyMessage.reminderMessage, {"reply_to_message_id": replyId});
-})
-
-agenda.define('clean-database', async job => {    
-    const numRemoved = await agenda.cancel({name: 'send-message'});
-    // console.log(numRemoved + " have been removed");
-});
-
-// agenda.schedule('in 10 seconds', 'task', {"id": 123});
-(async function() { // IIFE to give access to async/await
-    await agenda.start();
-    await agenda.every('1 minute', 'clean-database');
-})();
+const data = require('./data.js')
 
 async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     let chatId = msg.chat.id;
@@ -33,7 +13,7 @@ async function setReminder(msg, replyMessage, incomingMessage, replyId) {
         if(result[3] !== undefined) {
             bot.sendMessage(chatId, replyMessage.confirmation);
             console.log("Scheduling message in " + result[1]);
-            await agenda.schedule('in ' + result[1] + 'seconds', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
+            await agenda.schedule('in ' + result[1] + 'minutes', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
         } else if (result[4] !== undefined) {
             bot.sendMessage(chatId, replyMessage.confirmation);
             await agenda.schedule('in ' + result[1] + 'hours', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
@@ -48,26 +28,53 @@ async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     }
 }
 
-bot.onText(/\/conf (.+)/, (msg, match) => {
-    const reply = {
-        "reminderMessage" : "Aaka, samay hogya hai",
-        "confirmation" : "Ji! Mere aaka",
-        "errorMessage" : '❓'
-    };
+(async function() {
+    await syncMessageStats(); // Add event emitters after memory is synced with DB
 
-    setReminder(msg, reply, match[1], msg.message_id);
-})
-
-bot.onText(/\/remind (.+)/, (msg, match) => {
-    const reply = {
-        "reminderMessage" : "Reminder up",
-        "confirmation" : "Hanji!",
-        "errorMessage" : '❓'
-    };
-
-    if(msg.reply_to_message !== undefined) {
-        setReminder(msg, reply, match[1], msg.reply_to_message.message_id);
-    } else {
+    bot.onText(/\/conf (.+)/, (msg, match) => {
+        const reply = {
+            "reminderMessage" : "Aaka, samay hogya hai",
+            "confirmation" : "Ji! Mere aaka",
+            "errorMessage" : '❓'
+        };
+    
         setReminder(msg, reply, match[1], msg.message_id);
-    }
-})
+    })
+    
+    bot.onText(/\/remind (.+)/, (msg, match) => {
+        const reply = {
+            "reminderMessage" : "Reminder up",
+            "confirmation" : "Hanji!",
+            "errorMessage" : '❓'
+        };
+    
+        if(msg.reply_to_message !== undefined) {
+            setReminder(msg, reply, match[1], msg.reply_to_message.message_id);
+        } else {
+            setReminder(msg, reply, match[1], msg.message_id);
+        }
+    })
+    
+    bot.onText(/.+/, (msg, match) => {
+        let dataFound = false;
+
+        console.log("Data in memory", data.getArray());
+    
+        data.getArray().forEach(elm => {
+            if(elm._id == msg.chat.id) {
+                elm.totalMessages++;
+                dataFound = true;
+                console.log("Stats updated for " + elm._id);
+            }
+        });
+    
+        if(!dataFound) {
+            // Add data
+            data.push({
+                "_id": msg.chat.id,
+                "totalMessages": 1
+            })
+            console.log("Stats inserted for " + msg.chat.id);
+        }
+    })
+})();
