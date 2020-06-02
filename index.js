@@ -42,7 +42,7 @@ async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     
     bot.onText(/\/remind (.+)/, (msg, match) => {
         const reply = {
-            "reminderMessage" : "Reminder up",
+            "reminderMessage" : "Aaka, bhule toh nahi ?",
             "confirmation" : "Hanji!",
             "errorMessage" : '❓'
         };
