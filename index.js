@@ -1,5 +1,4 @@
 const agenda = require('./lib/agenda.js')
-const {sksGroupId} = require('./config.json')
 const bot = require('./lib/bot.js')
 const syncMessageStats = require('./lib/mongodb.js')
 
