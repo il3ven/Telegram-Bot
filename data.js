@@ -1,4 +1,3 @@
-
 let data = [];
 
 module.exports.push = function (json) {
