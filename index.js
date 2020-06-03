@@ -9,7 +9,7 @@ async function setReminder(msg, replyMessage, incomingMessage, replyId) {
         const job = await agenda.schedule(incomingMessage, 'send-message', {"chatId": msg.chat.id, "replyMessage": replyMessage, "replyId": replyId});
         const date = new Date(job.attrs.nextRunAt);
 
-        bot.sendMessage(msg.chat.id, `Mai aapko ${date.toLocaleString('en-gb', {timezone: 'Asia/Kolkata', hour12:true})} par yaad dila dunga`)
+        bot.sendMessage(msg.chat.id, `Mai aapko ${date.toLocaleString("en-GB", {timezone: "Asia/Kolkata"})} par yaad dila dunga`)
     } catch (error) {
         console.error("Could not create reminder");
         bot.sendMessage(msg.chat.id, replyMessage.errorMessage);
