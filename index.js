@@ -5,25 +5,14 @@ const syncMessageStats = require('./lib/mongodb.js')
 const data = require('./data.js')
 
 async function setReminder(msg, replyMessage, incomingMessage, replyId) {
-    let chatId = msg.chat.id;
-    const result = /.+ ([0-9]+) ((m|mins|min|minutes|minute)|(h|hour|hours)|(d|days|day))$/.exec(incomingMessage);
+    try {
+        const job = await agenda.schedule(incomingMessage, 'send-message', {"chatId": msg.chat.id, "replyMessage": replyMessage, "replyId": replyId});
+        const date = new Date(job.attrs.nextRunAt);
 
-    if(result !== null) {
-        if(result[3] !== undefined) {
-            bot.sendMessage(chatId, replyMessage.confirmation);
-            // console.log("Scheduling message in " + result[1]);
-            await agenda.schedule('in ' + result[1] + ' minutes', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
-        } else if (result[4] !== undefined) {
-            bot.sendMessage(chatId, replyMessage.confirmation);
-            await agenda.schedule('in ' + result[1] + ' hours', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
-        } else if (result[5] !== undefined) {
-            bot.sendMessage(chatId, replyMessage.confirmation);
-            await agenda.schedule('in ' + result[1] + ' days', 'send-message', {"chatId": chatId, "replyMessage": replyMessage, "replyId": replyId});
-        } else {
-            bot.sendMessage(chatId, replyMessage.errorMessage);
-        }
-    } else {
-        bot.sendMessage(chatId, replyMessage.errorMessage);
+        bot.sendMessage(msg.chat.id, `Reminder set for ${date.toLocaleString()}`)
+    } catch (error) {
+        console.error("Could not create reminder");
+        bot.sendMessage(msg.chat.id, replyMessage.errorMessage);
     }
 }
 
