@@ -5,7 +5,8 @@ const syncMessageStats = require('./lib/mongodb.js')
 
 const data = require('./data.js')
 
-const validTags = ['#important', '#imp'];
+// This array should be in lower case
+const validTags = ['#important', '#imp', '#serious', '#announcement', '#pinthis', 'pinthismessage', '#all'];
 
 async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     try {
@@ -80,7 +81,7 @@ function updateMessageStats(msg) {
 
                 msg.entities.forEach((entity) => {
                     if(entity.type === 'hashtag') {
-                        let receivedTag = msg.text.slice(entity.offset, entity.offset + entity.length);
+                        let receivedTag = msg.text.slice(entity.offset, entity.offset + entity.length).toLowerCase();
                         if(validTags.includes(receivedTag))
                         isValidTagPresent = true;
                     }
