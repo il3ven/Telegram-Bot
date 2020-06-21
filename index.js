@@ -1,8 +1,11 @@
+require('dotenv').config()
 const agenda = require('./lib/agenda.js')
 const bot = require('./lib/bot.js')
 const syncMessageStats = require('./lib/mongodb.js')
 
 const data = require('./data.js')
+
+const validTags = ['#important', '#imp'];
 
 async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     try {
@@ -13,6 +16,29 @@ async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     } catch (error) {
         console.error("Could not create reminder");
         bot.sendMessage(msg.chat.id, replyMessage.errorMessage);
+    }
+}
+
+function updateMessageStats(msg) {
+    let userFound = false; // Is the user id in database ?
+
+    console.log("Data in memory", data.getArray());
+
+    data.getArray().forEach(elm => {
+        if(elm._id == msg.chat.id) {
+            elm.totalMessages++;
+            userFound = true;
+            console.log("Stats updated for " + elm._id);
+        }
+    });
+
+    if(!userFound) {
+        // Add data
+        data.push({
+            "_id": msg.chat.id,
+            "totalMessages": 1
+        })
+        console.log("Stats inserted for " + msg.chat.id);
     }
 }
 
@@ -44,25 +70,26 @@ async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     })
     
     bot.onText(/.+/, (msg, match) => {
-        let dataFound = false;
+        updateMessageStats(msg);
 
-        console.log("Data in memory", data.getArray());
-    
-        data.getArray().forEach(elm => {
-            if(elm._id == msg.chat.id) {
-                elm.totalMessages++;
-                dataFound = true;
-                console.log("Stats updated for " + elm._id);
+        // Only broadcast those messages which are from the sks group
+        if(msg.chat.id == process.env.sksGroupId) {
+            if(msg.entities) {
+                // Some mention, hashtag present
+                let isValidTagPresent = false;
+
+                msg.entities.forEach((entity) => {
+                    if(entity.type === 'hashtag') {
+                        let receivedTag = msg.text.slice(entity.offset, entity.offset + entity.length);
+                        if(validTags.includes(receivedTag))
+                        isValidTagPresent = true;
+                    }
+                })
+
+                if(isValidTagPresent) {
+                    bot.forwardMessage(process.env.sksChannelId, msg.chat.id, msg.message_id);
+                }
             }
-        });
-    
-        if(!dataFound) {
-            // Add data
-            data.push({
-                "_id": msg.chat.id,
-                "totalMessages": 1
-            })
-            console.log("Stats inserted for " + msg.chat.id);
         }
     })
 })();
