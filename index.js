@@ -88,7 +88,7 @@ function updateMessageStats(msg) {
                 })
 
                 if(isValidTagPresent) {
-                    bot.forwardMessage(process.env.sksChannelId, msg.chat.id, msg.message_id);
+                    bot.forwardMessage(process.env.sksChannelId, msg.chat.id, msg.message_id, {'disable_notification': true});
                 }
             }
         }
