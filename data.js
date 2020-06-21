@@ -1,3 +1,8 @@
+/**
+ * The data received from Database is stored here.
+ * data[] acts as RAM
+ */
+
 let data = [];
 
 module.exports.push = function (json) {

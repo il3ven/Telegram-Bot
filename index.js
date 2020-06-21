@@ -1,3 +1,5 @@
+require('dotenv').config()
+console.log(process.env.MONGODB_URL)
 const agenda = require('./lib/agenda.js')
 const bot = require('./lib/bot.js')
 const syncMessageStats = require('./lib/mongodb.js')
