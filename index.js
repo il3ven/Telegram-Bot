@@ -87,7 +87,7 @@ function updateMessageStats(msg) {
                 })
 
                 if(isValidTagPresent) {
-                    bot.sendMessage(process.env.sksChannelId, msg.text);
+                    bot.forwardMessage(process.env.sksChannelId, msg.chat.id, msg.message_id);
                 }
             }
         }
