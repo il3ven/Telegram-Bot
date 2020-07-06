@@ -12,9 +12,9 @@ const validTags = ['#important', '#imp', '#serious', '#announcement', '#pinthis'
 function formatDate(nextRunAt) {
     let output = '';
 
-    if(nextRunAt.getTime() - Date.now() > 60000) {
+    if(nextRunAt.getTime() - Date.now() >= 60000) {
         // Time difference is greater than 1 minute
-        if(nextRunAt.getTime() - Date.now() > 86400000) {
+        if(nextRunAt.getTime() - Date.now() >= 86400000) {
             // Time difference is greater than 1 day
             const options = {weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true};
             output = nextRunAt.toLocaleString('en-GB', options);
