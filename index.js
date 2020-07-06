@@ -22,7 +22,7 @@ function formatDate(nextRunAt, timeNow) {
         output += nextRunAt.toLocaleString('en-US', {timeStyle: 'medium'}); // en-US for 12 hour time
     } else {
         // No difference between seconds thus omit it
-        output = nextRunAt.toLocaleString('en-US', {timeStyle: 'short'})
+        output += nextRunAt.toLocaleString('en-US', {timeStyle: 'short'})
     }
 
     return output;
