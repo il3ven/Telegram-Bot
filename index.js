@@ -8,12 +8,32 @@ const data = require('./data.js')
 // This array should be in lower case
 const validTags = ['#important', '#imp', '#serious', '#announcement', '#pinthis', 'pinthismessage', '#all'];
 
+// Util function
+function formatDate(nextRunAt) {
+    let output = '';
+
+    if(nextRunAt.getTime() - Date.now().getTime() > 60000) {
+        // Time difference is greater than 1 minute
+        if(nextRunAt.getTime() - Date.now().getTime() > 86400000) {
+            // Time difference is greater than 1 day
+            const options = {weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true};
+            output = nextRunAt.toLocaleString('en-GB', options);
+        } else {
+            output = nextRunAt.toLocaleString('en-US', {timeStyle: 'short'})
+        }
+    } else {
+        output = nextRunAt.toLocaleString('en-US', {timeStyle: 'medium'}); // en-US for 12 hour time
+    }
+
+    return output;
+}
+
 async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     try {
         const job = await agenda.schedule(incomingMessage, 'send-message', {"chatId": msg.chat.id, "replyMessage": replyMessage, "replyId": replyId});
         const date = new Date(job.attrs.nextRunAt);
 
-        bot.sendMessage(msg.chat.id, `Mai aapko ${date.toLocaleString("en-GB", {timezone: "Asia/Kolkata"})} par yaad dila dunga`)
+        bot.sendMessage(msg.chat.id, `Jo hukum. (${formatDate(date)})`)
     } catch (error) {
         console.error("Could not create reminder");
         bot.sendMessage(msg.chat.id, replyMessage.errorMessage);
