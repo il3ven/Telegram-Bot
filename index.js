@@ -9,12 +9,12 @@ const data = require('./data.js')
 const validTags = ['#important', '#imp', '#serious', '#announcement', '#pinthis', 'pinthismessage', '#all'];
 
 // Util function
-function formatDate(nextRunAt) {
+function formatDate(nextRunAt, timeNow) {
     let output = '';
 
-    if(nextRunAt.getTime() - Date.now() >= 60000) {
+    if(nextRunAt.getTime() - timeNow >= 60000) {
         // Time difference is greater than 1 minute
-        if(nextRunAt.getTime() - Date.now() >= 86400000) {
+        if(nextRunAt.getTime() - timeNow >= 86400000) {
             // Time difference is greater than 1 day
             const options = {weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true};
             output = nextRunAt.toLocaleString('en-GB', options);
@@ -30,10 +30,11 @@ function formatDate(nextRunAt) {
 
 async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     try {
+        const timeNow = Date.now(); // In milliseconds
         const job = await agenda.schedule(incomingMessage, 'send-message', {"chatId": msg.chat.id, "replyMessage": replyMessage, "replyId": replyId});
         const date = new Date(job.attrs.nextRunAt);
 
-        bot.sendMessage(msg.chat.id, `Jo hukum. (${formatDate(date)})`)
+        bot.sendMessage(msg.chat.id, `Jo hukum. (${formatDate(date, timeNow)})`)
     } catch (error) {
         console.error("Could not create reminder");
         bot.sendMessage(msg.chat.id, replyMessage.errorMessage);
