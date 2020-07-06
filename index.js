@@ -15,7 +15,7 @@ function formatDate(nextRunAt, timeNow) {
     if(nextRunAt.getDay() != timeNow.getDay()) {
         // Show long version
         const options = {weekday: 'short', month: 'short', day: 'numeric'};
-        output = nextRunAt.toLocaleString('en-GB', options);
+        output = nextRunAt.toLocaleString('en-GB', options) + ', ';
     }
 
     if(nextRunAt.getSeconds() != timeNow.getSeconds()) {
