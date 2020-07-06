@@ -12,17 +12,17 @@ const validTags = ['#important', '#imp', '#serious', '#announcement', '#pinthis'
 function formatDate(nextRunAt, timeNow) {
     let output = '';
 
-    if(nextRunAt.getTime() - timeNow >= 60000) {
-        // Time difference is greater than 1 minute
-        if(nextRunAt.getTime() - timeNow >= 86400000) {
-            // Time difference is greater than 1 day
-            const options = {weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true};
-            output = nextRunAt.toLocaleString('en-GB', options);
-        } else {
-            output = nextRunAt.toLocaleString('en-US', {timeStyle: 'short'})
-        }
+    if(nextRunAt.getDay() != timeNow.getDay()) {
+        // Show long version
+        const options = {weekday: 'short', month: 'short', day: 'numeric'};
+        output = nextRunAt.toLocaleString('en-GB', options);
+    }
+
+    if(nextRunAt.getSeconds() != timeNow.getSeconds()) {
+        output += nextRunAt.toLocaleString('en-US', {timeStyle: 'medium'}); // en-US for 12 hour time
     } else {
-        output = nextRunAt.toLocaleString('en-US', {timeStyle: 'medium'}); // en-US for 12 hour time
+        // No difference between seconds thus omit it
+        output = nextRunAt.toLocaleString('en-US', {timeStyle: 'short'})
     }
 
     return output;
@@ -30,7 +30,7 @@ function formatDate(nextRunAt, timeNow) {
 
 async function setReminder(msg, replyMessage, incomingMessage, replyId) {
     try {
-        const timeNow = Date.now(); // In milliseconds
+        const timeNow = new Date();
         const job = await agenda.schedule(incomingMessage, 'send-message', {"chatId": msg.chat.id, "replyMessage": replyMessage, "replyId": replyId});
         const date = new Date(job.attrs.nextRunAt);
 
