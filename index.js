@@ -1,9 +1,24 @@
-// require('dotenv').config()
+require('dotenv').config()
+const snoowrap = require('snoowrap');
 const agenda = require('./lib/agenda.js')
 const bot = require('./lib/bot.js')
 const syncMessageStats = require('./lib/mongodb.js')
 
 const data = require('./data.js')
+
+const reddit = new snoowrap({
+    userAgent: 'express',
+    clientId: process.env.reddit_clientid,
+    clientSecret: process.env.reddit_secret,
+    username: process.env.reddit_username,
+    password: process.env.reddit_password
+});
+
+reddit.getTop('aww', {time: 'day', limit: 10}).then((post) => {
+    console.log(post[0], post[5].url)
+    // bot.sendMessage(msg.chat.id, post[5].title);
+    // bot.sendVideo(msg.chat.id, post[5].media.reddit_video.fallback_url)
+}).catch(e => console.log(e));
 
 // This array should be in lower case
 const validTags = ['#important', '#imp', '#serious', '#announcement', '#pinthis', 'pinthismessage', '#all'];
