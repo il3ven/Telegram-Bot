@@ -1,4 +1,4 @@
-// require('dotenv').config()
+require('dotenv').config()
 const agenda = require('./lib/agenda.js')
 const bot = require('./lib/bot.js')
 const syncMessageStats = require('./lib/mongodb.js')

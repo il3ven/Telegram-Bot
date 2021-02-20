@@ -12,7 +12,8 @@
   "dependencies": {
     "agenda": "^3.1.0",
     "mongodb": "^3.6.2",
-    "node-telegram-bot-api": "^0.50.0"
+    "node-telegram-bot-api": "^0.50.0",
+    "snoowrap": "^1.22.0"
   },
   "engines": {
     "node": "12.x"
